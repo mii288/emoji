@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2021 by mii288 (http://jsbin.com/rixigil/51/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+<script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
+<script type="text/javascript" src="https://typesquare.com/accessor/script/typesquare.js?g7M8aOtb3Ww%3D" charset="utf-8"></script>
+  <title>JS Bin</title>
+<style id="jsbin-css">
+* {
+    outline: none;
+    margin: 0;
+    padding: 0;
+}
+html {
+    font-size: 15px;
+    font-family: "ヒラギノ角ゴ W8 JIS2004";
+}
+
+body, input, button {
+    width: 250px;
+    margin: 1rem auto;
+    text-align: center;
+    font: inherit;
+}
+
+h1 {
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.string {
+    display: block;
+    color: #888;
+    margin-bottom: 1rem;
+}
+
+canvas {
+    margin: 1rem 0 0;
+    border: 1px solid #efefef;
+    height: auto;
+    background: #fff;
+    overfrow: hidden;
+    font-size: 0;
+    display: inline-block;
+}
+
+input, button {
+    -webkit-appearance: none;
+    background: #fff;
+    border: 1px solid #efefef;
+    margin: 0;
+    padding: 0.5em 1em;
+    width: 100%;
+    height: 44px;
+    box-sizing: border-box;
+    vertical-align: bottom;
+    font-size: 1rem;
+}
+
+input {
+    margin: 1rem 0 0.5rem;
+}
+
+
+button {
+    color: #fff;
+    background: #E64A19;
+    margin: 0 auto 0.5rem;
+}
+</style>
+</head>
+<body onload="canvas.init();">
+    <h1>絵文字作るよβ</h1>
+<div class="js-generator">
+<div class="background">
+    <canvas id="demoCanvas" width="128" height="128"></canvas>
+    <span class="string">『{{ string }}』</span>
+</div>
+<input type="text" placeholder="絵文字にしたい4文字" v-model="string">
+    <button class="button-download" v-on:click="download">ダウンロード</button>
+</div>
+<script id="jsbin-javascript">
+var canvas = new Vue({
+    el: '.js-generator',
+    data: {
+        string: 'やばそう',
+        stage: {},
+        text: {},
+        textOutline: {},
+    },
+    watch: {
+      string: 'update',
+    },
+    created: function() {
+      this.init();
+    },
+    methods: {
+        fontLoad: function() {
+            var script = document.createElement('script');
+script.src = '//typesquare.com/accessor/script/typesquare.js?g7M8aOtb3Ww%3D';
+document.body.appendChild(script);
+
+            this.stage.update();
+        },
+        update: function() {
+
+            var self = this;
+            self.fontLoad();
+            window.setTimeout(function (){
+                self.text.text = self.splitEveryTwoChars(self.string);
+                self.stage.update();
+            }, 1000);
+        },
+        init: function() {
+            this.stage = new createjs.Stage("demoCanvas");
+
+            // canvasに文字を挿入
+            this.createBoldText(this.string);
+        },
+        createBoldText: function(string) {
+            this.text = this.createText(null, string)
+            this.stage.addChild(this.text);
+            this.stage.update();
+        },
+        createText: function(outline, string) {
+            var text = new createjs.Text();
+            var fontSize = 64;
+
+            text.font = fontSize + "px 'ヒラギノ角ゴ W8 JIS2004'";
+            text.lineHeight = fontSize * 1;
+            text.color = "#000000";
+            text.text = this.splitEveryTwoChars(string);
+            text.regY = -33;
+            text.textBaseline = 'middle';
+
+            return text;
+        },
+        splitEveryTwoChars: function(string) {
+            var index = 2;
+            var insert = "\n";
+
+            return string.slice(0, index) + insert + string.slice(index, string.length);
+        },
+        download: function () {
+            var canvas = document.getElementById("demoCanvas");
+            var data = canvas.toDataURL("image/png");
+            window.open(data);
+        }
+    },
+});
+
+</script>
+</body>
+</html>
