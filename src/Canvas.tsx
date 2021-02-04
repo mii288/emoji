@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react'
 
 interface EmojiSetting {
@@ -7,27 +8,54 @@ interface EmojiSetting {
   height: number
 }
 
+const getTextSize = (
+  ctx: CanvasRenderingContext2D,
+  text: EmojiSetting['text']
+) => {
+  const {
+    actualBoundingBoxAscent,
+    actualBoundingBoxDescent,
+    width,
+  } = ctx.measureText(text)
+
+  return { width, height: actualBoundingBoxDescent + actualBoundingBoxAscent }
+}
+
 const createText = (
   ctx: CanvasRenderingContext2D,
   { text, textColor, width, height }: EmojiSetting
 ) => {
   const lines = text.split('\n')
-  const fontSize = height / lines.length
-  const lineHeight = 1
+  const lineWidth = width
+  const lineHeight = height / lines.length
+
+  const fontSize = lineHeight
 
   ctx.font = `bold ${fontSize}px Noto Sans JP`
   ctx.textAlign = 'left'
-  // TODO: 英字
   ctx.textBaseline = 'top'
   ctx.strokeStyle = '#fff'
+  ctx.lineWidth = fontSize * 0.1
   ctx.fillStyle = textColor
 
-  let nextHeight = 0
-  lines.forEach((line) => {
-    ctx.strokeText(line, 0, nextHeight, width)
-    ctx.fillText(line, 0, nextHeight, width)
+  let nextY = 0
+  lines.forEach((line, index) => {
+    ctx.scale(1, 1)
+    const textSize = getTextSize(ctx, line)
+    const textHeight = textSize.height * lineHeight
 
-    nextHeight += lineHeight * fontSize
+    const posY = lineHeight * index
+
+    ctx.save()
+    ctx.scale(
+      textSize.width < lineWidth ? lineWidth / textSize.width : 1,
+      textHeight < lineHeight ? lineHeight / textHeight : 1
+    )
+    ctx.strokeText(line, 0, posY, lineWidth)
+    ctx.fillText(line, 0, posY, lineWidth)
+    ctx.restore()
+
+    nextY = textHeight
   })
 }
 
