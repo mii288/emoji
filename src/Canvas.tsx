@@ -1,37 +1,49 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-const createText = (ctx, { text, textColor, width, height }) => {
-  const lines = text.split("\n")
-  const fontSize = height / lines.length;
+interface EmojiSetting {
+  text: string
+  textColor: string
+  width: number
+  height: number
+}
+
+const createText = (
+  ctx: CanvasRenderingContext2D,
+  { text, textColor, width, height }: EmojiSetting
+) => {
+  const lines = text.split('\n')
+  const fontSize = height / lines.length
   const lineHeight = 1
 
   ctx.font = `bold ${fontSize}px Noto Sans JP`
-  ctx.textAlign = "left";
+  ctx.textAlign = 'left'
   // TODO: 英字
-  ctx.textBaseline = "top";
-  ctx.strokeStyle = "#fff"
-  ctx.fillStyle = textColor 
+  ctx.textBaseline = 'top'
+  ctx.strokeStyle = '#fff'
+  ctx.fillStyle = textColor
 
-  let nextHeight = 0;
+  let nextHeight = 0
   lines.forEach((line) => {
-    ctx.strokeText(line, 0, nextHeight, width);
+    ctx.strokeText(line, 0, nextHeight, width)
     ctx.fillText(line, 0, nextHeight, width)
 
     nextHeight += lineHeight * fontSize
   })
 }
 
-function Canvas({ text, textColor, width, height }) {
-  const [png, setPng] = useState(null)
+type Props = EmojiSetting
+function Canvas({ text, textColor, width, height }: Props): JSX.Element {
+  const [png, setPng] = useState<null | string>(null)
 
   useEffect(() => {
     const canvasElem = document.createElement('canvas')
     canvasElem.width = width
     canvasElem.height = height
     const ctx = canvasElem.getContext('2d')
+    if (!ctx) return
 
     ctx.clearRect(0, 0, width, height)
-    ctx.fillStyle = "transparent";
+    ctx.fillStyle = 'transparent'
 
     createText(ctx, { text, textColor, width, height })
 
